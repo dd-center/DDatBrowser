@@ -2,7 +2,7 @@
 // @name         DD@Browser
 // @namespace    https://vtbs.moe/
 // @version      0.1
-// @description  DD@Browser
+// @description  DD@Home, Browser plugin
 // @author       simon3000
 // @include      *://www.bilibili.com*
 // @include      *://live.bilibili.com*
