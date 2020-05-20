@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DD@Browser
 // @namespace    https://vtbs.moe/
-// @version      0.2
+// @version      0.3
 // @description  Browser plugin of DD@Home project
 // @license   MIT
 // @supportURL https://github.com/dd-center/DDatBrowser/issues
@@ -44,7 +44,7 @@ const runtime = () => {
 const makeURL = () => {
   const url = new URL('wss://cluster.vtbs.moe')
   url.searchParams.set('runtime', runtime())
-  url.searchParams.set('version', 0.1)
+  url.searchParams.set('version', 0.3)
   url.searchParams.set('platform', navigator.platform)
 
   return url
@@ -88,7 +88,7 @@ const start = () => new Promise(resolve => {
     log('WebSocket Open')
     while (ws.readyState === 1) {
       ws.send('DDDhttp')
-      await wait(780)
+      await wait(1280)
     }
   }
 })
