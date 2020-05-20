@@ -1,8 +1,10 @@
 // ==UserScript==
 // @name         DD@Browser
 // @namespace    https://vtbs.moe/
-// @version      0.1
-// @description  DD@Home, Browser plugin
+// @version      0.2
+// @description  Browser plugin of DD@Home project
+// @license   MIT
+// @supportURL https://github.com/dd-center/DDatBrowser/issues
 // @author       simon3000
 // @include      *://www.bilibili.com*
 // @include      *://live.bilibili.com*
