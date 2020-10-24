@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         DD@Browser
 // @namespace    https://vtbs.moe/
-// @version      0.3
-// @description  Browser plugin of DD@Home project
+// @version      0.4
+// @description  Browser plugin of DD@Home project, by vtbs.moe. 安装后浏览bilibili遇到问题请关闭并报告（抱歉啦）
 // @license   MIT
 // @supportURL https://github.com/dd-center/DDatBrowser/issues
 // @author       simon3000
@@ -13,6 +13,7 @@
 // ==/UserScript==
 
 const INTERVAL = 5000
+const pullInterval = 1280
 
 const log = (...message) => console.log('DD@Browser:', ...message)
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
@@ -88,7 +89,7 @@ const start = () => new Promise(resolve => {
     log('WebSocket Open')
     while (ws.readyState === 1) {
       ws.send('DDDhttp')
-      await wait(1280)
+      await wait(pullInterval)
     }
   }
 })
