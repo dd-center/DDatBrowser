@@ -1,19 +1,27 @@
 // ==UserScript==
 // @name         DD@Browser
 // @namespace    https://vtbs.moe/
-// @version      0.4
+// @version      0.5
 // @description  Browser plugin of DD@Home project, by vtbs.moe. 安装后浏览bilibili遇到问题请关闭并报告（抱歉啦）
 // @license   MIT
 // @supportURL https://github.com/dd-center/DDatBrowser/issues
 // @author       simon3000
 // @include      *://www.bilibili.com*
 // @include      *://live.bilibili.com*
+// @include      *://space.bilibili.com*
+// @include      *://t.bilibili.com*
 // @grant GM_setValue
 // @grant GM_getValue
 // ==/UserScript==
 
-const INTERVAL = 5000
-const pullInterval = 1280
+const INTERVAL = 5000 //从页面加载完成到开始脚本
+const pullInterval = 700 //单条任务执行时限，结束后开始下一个任务（设置为650不会出现412，但保险起见设置700）
+const loopInterval = 300 //意义不明
+const logSend = false //是否打印部分日志
+
+const cooldownMaxLoopTimes=1000 //每过n个循环后冷却一次避免412错误
+const cooldownTime=70000 //冷却时间
+var cooldownLoopTimes=0 //初始化
 
 const log = (...message) => console.log('DD@Browser:', ...message)
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
@@ -72,15 +80,26 @@ const start = () => new Promise(resolve => {
     if (data) {
       const { type, url } = data
       if (type === 'http') {
-        log('job received', url)
-        const time = Date.now()
-        const result = await fetch(url)
-        const text = await result.text()
-        ws.send(JSON.stringify({
-          key,
-          data: text
-        }))
-        log(`job complete ${((Date.now() - time) / 1000).toFixed(2)}s`)
+        if (logSend == false){
+            const result = await fetch(url)
+            const text = await result.text()
+            ws.send(JSON.stringify({
+              key,
+              data: text
+            }))
+        }
+
+        else{
+            log('job received', url)
+            const time = Date.now()
+            const result = await fetch(url)
+            const text = await result.text()
+            ws.send(JSON.stringify({
+              key,
+              data: text
+            }))
+            log(`job complete ${((Date.now() - time) / 1000).toFixed(2)}s    ${Date()}`)
+        }
       }
     }
   }
@@ -90,6 +109,12 @@ const start = () => new Promise(resolve => {
     while (ws.readyState === 1) {
       ws.send('DDDhttp')
       await wait(pullInterval)
+
+      cooldownLoopTimes+=1
+      if (cooldownLoopTimes>cooldownMaxLoopTimes){ //达到一定条件后等待一段时间作为冷却
+          cooldownLoopTimes=0
+          await wait(cooldownTime)
+      }
     }
   }
 })
@@ -98,7 +123,7 @@ const open = async () => {
   log('open')
   while (true) {
     await start()
-    await wait(1000)
+    await wait(loopInterval)
   }
 }
 
