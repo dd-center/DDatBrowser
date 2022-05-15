@@ -15,7 +15,7 @@
 // ==/UserScript==
 
 const INTERVAL = 5000 //从页面加载完成到开始脚本
-const pullInterval = 700 //单条任务执行时限，结束后开始下一个任务（设置为650不会出现412，但保险起见设置700）
+const pullInterval = 800 //单条任务执行时限，结束后开始下一个任务（设置为650不会出现412，但保险起见设置800）
 const loopInterval = 300 //意义不明
 const logSend = false //是否打印部分日志
 
