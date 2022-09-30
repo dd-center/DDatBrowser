@@ -74,7 +74,7 @@ const start = () => new Promise(resolve => {
       if (type === 'http') {
         log('job received', url)
         const time = Date.now()
-        const result = await fetch(url)
+        const result = await fetch(url, { credentials: 'include' })
         const text = await result.text()
         ws.send(JSON.stringify({
           key,
