@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DD@Browser
 // @namespace    https://vtbs.moe/
-// @version      0.4
+// @version      0.5
 // @description  Browser plugin of DD@Home project, by vtbs.moe. 安装后浏览bilibili遇到问题请关闭并报告（抱歉啦）
 // @license   MIT
 // @supportURL https://github.com/dd-center/DDatBrowser/issues
