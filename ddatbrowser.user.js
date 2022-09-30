@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DD@Browser
 // @namespace    https://vtbs.moe/
-// @version      0.5
+// @version      0.6
 // @description  Browser plugin of DD@Home project, by vtbs.moe. 安装后浏览bilibili遇到问题请关闭并报告（抱歉啦）
 // @license   MIT
 // @supportURL https://github.com/dd-center/DDatBrowser/issues
@@ -11,6 +11,8 @@
 // @grant GM_setValue
 // @grant GM_getValue
 // ==/UserScript==
+
+const VERSION = 0.6
 
 const INTERVAL = 5000
 const pullInterval = 1280
@@ -45,7 +47,7 @@ const runtime = () => {
 const makeURL = () => {
   const url = new URL('wss://cluster.vtbs.moe')
   url.searchParams.set('runtime', runtime())
-  url.searchParams.set('version', 0.3)
+  url.searchParams.set('version', VERSION)
   url.searchParams.set('platform', navigator.platform)
 
   return url
