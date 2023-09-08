@@ -1,15 +1,15 @@
 // ==UserScript==
 // @name         DD@Browser
 // @namespace    https://vtbs.moe/
-// @version      0.7
+// @version      0.8
 // @description  Browser plugin of DD@Home project, by vtbs.moe. 安装后浏览bilibili遇到问题请关闭并报告（抱歉啦）
 // @license   MIT
 // @supportURL https://github.com/dd-center/DDatBrowser/issues
 // @author       simon3000
 // @include      *://www.bilibili.com*
 // @include      *://live.bilibili.com*
-// @grant GM_setValue
-// @grant GM_getValue
+// @grant GM.setValue
+// @grant GM.getValue
 // ==/UserScript==
 
 const VERSION = 0.7
@@ -19,8 +19,10 @@ const pullInterval = 1280
 
 const log = (...message) => console.log('DD@Browser:', ...message)
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
-const set = (key, value) => GM_setValue(key, value)
-const get = (key, d) => GM_getValue(key, d)
+const set = (key, value) => GM.setValue(key, value)
+const get = (key, d) => GM.getValue(key, d)
+
+const channel = new BroadcastChannel('DDSync')
 
 const id = Date.now()
 
@@ -44,14 +46,14 @@ const runtime = () => {
   return uas[uas.length - 1]
 }
 
-const makeURL = () => {
+const makeURL = async () => {
   const url = new URL('wss://cluster.vtbs.moe')
   url.searchParams.set('runtime', runtime())
   url.searchParams.set('version', VERSION)
   url.searchParams.set('platform', navigator.platform)
 
-  const uuid = get('uuid', String(Math.random()))
-  set('uuid', uuid)
+  const uuid = await get('uuid', String(Math.random()))
+  await set('uuid', uuid)
 
   log('uuid', uuid)
 
@@ -67,9 +69,9 @@ const parse = string => {
   return JSON.parse(string)
 }
 
-const start = () => new Promise(resolve => {
+const start = () => new Promise(async resolve => {
   log('Start')
-  const ws = new WebSocket(makeURL())
+  const ws = new WebSocket(await makeURL())
 
   ws.onclose = e => {
     log('Close', e.code)
@@ -83,7 +85,11 @@ const start = () => new Promise(resolve => {
       if (type === 'http') {
         log('job received', url)
         const time = Date.now()
-        const result = await fetch(url, { credentials: 'include' })
+        const options = {}
+        if (url.includes('bilibili.com')) { // PeroPero no credentials
+          options.credentials = 'include'
+        }
+        const result = await fetch(url, options)
         const text = await result.text()
         ws.send(JSON.stringify({
           key,
@@ -111,19 +117,30 @@ const open = async () => {
   }
 }
 
-setInterval(() => {
-  const currentClock = get('now', 0)
-  const diff = Date.now() - currentClock
-  if (diff > INTERVAL * 3) {
-    set('me', id)
-    if (!on) {
-      open()
-      on = true
-    }
-  }
-  if (get('me', 0) === id) {
-    set('now', Date.now())
-  }
-}, INTERVAL)
+let timeout
 
-log('hi')
+channel.onmessage = async ({ data }) => {
+  if (data === 'wait') {
+    log('wait')
+    clearTimeout(timeout)
+  }
+  if (data === 'start' && on) {
+    channel.postMessage('wait')
+  }
+}
+
+const hi = async () => {
+  log('hi')
+  await wait(1000 * 5 * Math.random())
+  while (!on) {
+    timeout = setTimeout(() => {
+      on = true
+      channel.postMessage('wait')
+      open()
+    }, 1000 * 8)
+    channel.postMessage('start')
+    await wait(1000 * 10)
+  }
+}
+
+hi()
