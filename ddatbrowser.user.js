@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DD@Browser
 // @namespace    https://vtbs.moe/
-// @version      0.10
+// @version      1.0
 // @updateURL https://greasyfork.org/scripts/403819-dd-browser/code/DD@Browser.user.js
 // @description  Browser plugin of DD@Home project, by vtbs.moe. 安装后浏览bilibili遇到问题请关闭并报告（抱歉啦）
 // @license   MIT
@@ -13,12 +13,13 @@
 // @grant GM.getValue
 // ==/UserScript==
 
-const VERSION = 0.10
+const VERSION = '1.0'
 
 const INTERVAL = 5000
 const pullInterval = 1280
 
 const log = (...message) => console.log('DD@Browser:', ...message)
+const info = (...message) => console.info('DD@Browser:', ...message)
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
 const set = (key, value) => GM.setValue(key, value)
 const get = (key, d) => GM.getValue(key, d)
@@ -53,12 +54,17 @@ const makeURL = async () => {
   url.searchParams.set('version', VERSION)
   url.searchParams.set('platform', navigator.platform)
 
-  const uuid = await get('uuid', String(Math.random()))
+  const uuid = localStorage.DDUUID || await get('uuid', String(Math.random()))
   await set('uuid', uuid)
 
   log('uuid', uuid)
 
   url.searchParams.set('uuid', uuid)
+
+  const name = localStorage.DDName
+  if (name) {
+    url.searchParams.set('name', name)
+  }
 
   return url
 }
@@ -145,3 +151,6 @@ const hi = async () => {
 }
 
 hi()
+info(`你可以通过 localStorage.DDUUID = 'uuid' 来设置 UUID, 以便记录你的数据`)
+info(`你可以通过 localStorage.DDName = '你的名字' 来设置展示的名字`)
+
