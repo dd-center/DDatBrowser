@@ -15,8 +15,7 @@
 
 const VERSION = '1.0'
 
-const INTERVAL = 5000
-const pullInterval = 1280
+const pullInterval = 460
 
 const log = (...message) => console.log('DD@Browser:', ...message)
 const info = (...message) => console.info('DD@Browser:', ...message)
@@ -138,13 +137,13 @@ channel.onmessage = async ({ data }) => {
 
 const hi = async () => {
   log('hi')
-  await wait(1000 * 5 * Math.random())
+  await wait(1000 * Math.random())
   while (!on) {
     timeout = setTimeout(() => {
       on = true
       channel.postMessage('wait')
       open()
-    }, 1000 * 8)
+    }, 1000 * 3)
     channel.postMessage('start')
     await wait(1000 * 10)
   }
