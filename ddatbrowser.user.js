@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DD@Browser
 // @namespace    https://vtbs.moe/
-// @version      1.1
+// @version      1.2
 // @updateURL https://greasyfork.org/scripts/403819-dd-browser/code/DD@Browser.user.js
 // @description  Browser plugin of DD@Home project, by vtbs.moe. 安装后浏览bilibili遇到问题请关闭并报告（抱歉啦）
 // @license   MIT
@@ -9,6 +9,7 @@
 // @author       simon3000
 // @include      *://www.bilibili.com*
 // @include      *://live.bilibili.com*
+// @include      *://t.bilibili.com*
 // @grant GM.setValue
 // @grant GM.getValue
 // ==/UserScript==
@@ -9057,14 +9058,24 @@ var require_core = __commonJS({
 });
 
 // version.js
-var VERSION = "1.1";
+var VERSION = "1.2";
 
 // index.js
 var import_ddatnodejs = __toESM(require_core(), 1);
 var INTERVAL = 460;
 var wsLimit = 128;
-var log = (...message) => console.log("DD@Browser:", ...message);
+var logLimit = 1024;
 var info = (...message) => console.info("DD@Browser:", ...message);
+var log = (...message) => {
+  if (logLimit <= 0) {
+    return;
+  }
+  console.log("DD@Browser:", ...message);
+  logLimit--;
+  if (logLimit === 0) {
+    info("log 太多, 不再显示");
+  }
+};
 var wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 var set = (key, value) => GM.setValue(key, value);
 var get = (key, d) => GM.getValue(key, d);

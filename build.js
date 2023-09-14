@@ -12,6 +12,7 @@ const js = `// ==UserScript==
 // @author       simon3000
 // @include      *://www.bilibili.com*
 // @include      *://live.bilibili.com*
+// @include      *://t.bilibili.com*
 // @grant GM.setValue
 // @grant GM.getValue
 // ==/UserScript==`

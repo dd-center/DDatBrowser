@@ -5,8 +5,19 @@ import DDAtHome from 'ddatnodejs'
 const INTERVAL = 460
 const wsLimit = 128
 
-const log = (...message) => console.log('DD@Browser:', ...message)
+let logLimit = 1024
+
 const info = (...message) => console.info('DD@Browser:', ...message)
+const log = (...message) => {
+  if (logLimit <= 0) {
+    return
+  }
+  console.log('DD@Browser:', ...message)
+  logLimit--
+  if (logLimit === 0) {
+    info('log 太多, 不再显示')
+  }
+}
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
 const set = (key, value) => GM.setValue(key, value)
 const get = (key, d) => GM.getValue(key, d)
