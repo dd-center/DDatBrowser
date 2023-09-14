@@ -1,6 +1,9 @@
 import { VERSION } from './version.js'
 
-const pullInterval = 460
+import DDAtHome from 'ddatnodejs'
+
+const INTERVAL = 460
+const wsLimit = 128
 
 const log = (...message) => console.log('DD@Browser:', ...message)
 const info = (...message) => console.info('DD@Browser:', ...message)
@@ -10,9 +13,24 @@ const get = (key, d) => GM.getValue(key, d)
 
 const channel = new BroadcastChannel('DDSync')
 
-const id = Date.now()
+const f = url => {
+  const options = {}
+  if (url.includes('bilibili.com')) { // PeroPero no credentials
+    options.credentials = 'include'
+  }
+  return fetch(url, options)
+}
+
+const getMID = async () => {
+  const { data: { isLogin, mid } } = await f('https://api.bilibili.com/x/web-interface/nav').then(r => r.json())
+  if (isLogin) {
+    return mid
+  }
+  return 0
+}
 
 let on = false
+const midP = getMID()
 
 const runtime = () => {
   const uas = navigator.userAgent.split(' ')
@@ -53,59 +71,17 @@ const makeURL = async () => {
   return url
 }
 
-const parse = string => {
-  if (string === 'wait') {
-    return { empty: true }
+const getBUVID = () => {
+  const buvid3 = document.cookie.split('; ').find(c => c.startsWith('buvid3='))
+  if (buvid3) {
+    return buvid3.split('=')[1]
   }
-  return JSON.parse(string)
 }
-
-const start = () => new Promise(async resolve => {
-  log('Start')
-  const ws = new WebSocket(await makeURL())
-
-  ws.onclose = e => {
-    log('Close', e.code)
-    resolve()
-  }
-
-  ws.onmessage = async ({ data: message }) => {
-    const { key, data } = parse(message)
-    if (data) {
-      const { type, url } = data
-      if (type === 'http') {
-        log('job received', url)
-        const time = Date.now()
-        const options = {}
-        if (url.includes('bilibili.com')) { // PeroPero no credentials
-          options.credentials = 'include'
-        }
-        const result = await fetch(url, options)
-        const text = await result.text()
-        ws.send(JSON.stringify({
-          key,
-          data: text
-        }))
-        log(`job complete ${((Date.now() - time) / 1000).toFixed(2)}s`)
-      }
-    }
-  }
-
-  ws.onopen = async () => {
-    log('WebSocket Open')
-    while (ws.readyState === 1) {
-      ws.send('DDDhttp')
-      await wait(pullInterval)
-    }
-  }
-})
 
 const open = async () => {
   log('open')
-  while (true) {
-    await start()
-    await wait(1000)
-  }
+  const home = new DDAtHome(await makeURL(), { INTERVAL, wsLimit, WebSocket, customFetch: f, getBUVID, uid: await midP, liveInterval: INTERVAL * 2 })
+  home.on('log', log)
 }
 
 let timeout

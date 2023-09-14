@@ -5,5 +5,8 @@
   "type": "module",
   "devDependencies": {
     "esbuild": "^0.19.2"
+  },
+  "dependencies": {
+    "ddatnodejs": "file:DDatHome-nodejs"
   }
 }
