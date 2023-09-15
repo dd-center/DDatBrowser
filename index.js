@@ -2,7 +2,7 @@ import { VERSION } from './version.js'
 
 import DDAtHome from 'ddatnodejs'
 
-const INTERVAL = 460
+const INTERVAL = 630
 const wsLimit = 128
 
 let logLimit = 1024
