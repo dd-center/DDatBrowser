@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DD@Browser
 // @namespace    https://vtbs.moe/
-// @version      1.3
+// @version      1.4
 // @updateURL https://greasyfork.org/scripts/403819-dd-browser/code/DD@Browser.user.js
 // @description  Browser plugin of DD@Home project, by vtbs.moe. 安装后浏览bilibili遇到问题请关闭并报告（抱歉啦）
 // @license   MIT
@@ -9058,12 +9058,12 @@ var require_core = __commonJS({
 });
 
 // version.js
-var VERSION = "1.3";
+var VERSION = "1.4";
 
 // index.js
 var import_ddatnodejs = __toESM(require_core(), 1);
 var INTERVAL = 630;
-var wsLimit = 128;
+var wsLimit = 0;
 var logLimit = 1024;
 var info = (...message) => console.info("DD@Browser:", ...message);
 var log = (...message) => {
